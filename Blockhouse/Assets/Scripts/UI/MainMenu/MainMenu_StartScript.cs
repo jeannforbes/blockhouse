@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StartGameScript : MonoBehaviour {
+public class MainMenu_StartScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -15,7 +15,8 @@ public class StartGameScript : MonoBehaviour {
 		
 	}
 
-    public void LoadByIndex(int sceneIndex) {
+    public void LoadByIndex(int sceneIndex)
+    {
         Debug.Log("Loading Scene: " + sceneIndex);
 
         SceneManager.LoadScene(sceneIndex);

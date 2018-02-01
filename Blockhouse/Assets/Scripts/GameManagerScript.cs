@@ -4,24 +4,57 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour {
 
+    // singleton-type GameManager
+    public static GameManagerScript instance = null;
+
     public enum GameStates {
         Build,
         Destroy
     }
 
     public GameStates gameState;
+    public Canvas canvas;
+
+    public GameStates GameState {
+        get {
+            return gameState;
+        }
+        set {
+            gameState = value;
+            
+            if (gameState == GameStates.Build) {
+                canvas.GetComponent<CanvasScript>().destroyMode.SetActive(false);
+                canvas.GetComponent<CanvasScript>().buildMode.SetActive(true);
+            }
+            else if (gameState == GameStates.Destroy)
+            {
+                canvas.GetComponent<CanvasScript>().buildMode.SetActive(false);
+                canvas.GetComponent<CanvasScript>().destroyMode.SetActive(true);
+            }
+        }
+    }
+
 
     private Camera mainCamera;
     private GameObject selectedCube;
     private GameObject tempCube;
 
     public GameObject[] cubes;
-
-    //Fire
-    private float shotForce = 1000.0f;
-    //public float moveSpeed = 10f;
-
+    
+    public float shotForce = 1000.0f;
     private Vector3 fireDirection;
+
+    private void Awake() {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this) {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     // Use this for initialization
     void Start () {
@@ -30,6 +63,7 @@ public class GameManagerScript : MonoBehaviour {
 
         mainCamera = Camera.main;
 
+        //GameState = GameStates.Build;
         gameState = GameStates.Destroy;
 
         cubes = GameObject.FindGameObjectsWithTag("Cube");
@@ -37,12 +71,9 @@ public class GameManagerScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        // BUILD
-        if (gameState == GameStates.Build) { }
-
 
         // DESTROY
-        else if (gameState == GameStates.Destroy)
+        if (gameState == GameStates.Destroy)
         {
             //Debug.Log("DESTROY");
             // Select Cube
@@ -73,7 +104,6 @@ public class GameManagerScript : MonoBehaviour {
             // Throw Cube
             if (selectedCube != null)
             {
-
                 fireDirection = selectedCube.transform.position - mainCamera.transform.position;
                 fireDirection.Normalize();
 
@@ -81,11 +111,22 @@ public class GameManagerScript : MonoBehaviour {
                 {
                     Debug.Log("FIRE!");
 
+                    // Remove joints
+                    FixedJoint[] joints = selectedCube.GetComponents<FixedJoint>();
+                    Debug.Log("WTF: " + joints.Length);
+                    for (int i = 0; i < joints.Length; i++) {
+                        Destroy(joints[i]);
+                    }
+
                     Vector3 shotVector = fireDirection * shotForce;
                     selectedCube.GetComponent<Rigidbody>().AddForce(shotVector);
                 }
             }
         }
+
+
+        // BUILD
+        if (gameState == GameStates.Build) { }
 
     }
 
