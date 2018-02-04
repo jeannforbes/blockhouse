@@ -12,7 +12,7 @@ public class CubeScript : MonoBehaviour
     public float jointBreakForce = 5.0f;
     public float jointBreakTorque = 5.0f;
 
-    private float checkRadius = 4.0f;
+    //private float checkRadius = 4.0f;
 
     public List<GameObject> connectedObjects;
 
@@ -30,6 +30,9 @@ public class CubeScript : MonoBehaviour
     }
     void OnCollisionEnter(Collision collisionObj)
     {
+        if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
+            return;
+
         if (collisionObj.gameObject.tag != "Cube")
             return;
 
@@ -54,6 +57,9 @@ public class CubeScript : MonoBehaviour
     }
     void OnCollisionStay(Collision collisionObj)
     {
+        if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
+            return;
+
         if (collisionObj.gameObject.tag != "Cube")
             return;
 
@@ -77,21 +83,21 @@ public class CubeScript : MonoBehaviour
         }
     }
 
-    private void AddFixedJoint(GameObject collisionObj) {
+    public void AddFixedJoint(GameObject collisionObj) {
         // Check if already connected
         if (connectedObjects.Contains(collisionObj)) {
             //Debug.Log("ALREADY CONNECTED");
             return;
         }
-        Debug.Log("WTF ARE YOU DOING? " + connectedObjects.Count);
+
         connectedObjects.Add(collisionObj);
 
         var joint = gameObject.AddComponent<FixedJoint>();
         joint.breakForce = jointBreakForce;
         joint.breakTorque = jointBreakTorque;
-        //collisionObj.GetComponent<Rigidbody>();
-        //joint.connectedBody = collisionObj.GetComponent<Collision>().rigidbody;
         joint.connectedBody = collisionObj.GetComponent<Rigidbody>();
+
+        collisionObj.GetComponent<CubeScript>().AddFixedJoint(gameObject);
     }
 
     public bool IsSelected

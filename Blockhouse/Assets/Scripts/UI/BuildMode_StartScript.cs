@@ -15,8 +15,8 @@ public class BuildMode_StartScript : MonoBehaviour {
 	}
 
     public void StartDestroyMode() {
-        Debug.Log("something");
-        Debug.Log(GameManagerScript.instance.GameState);
-        GameManagerScript.instance.GameState = GameManagerScript.GameStates.Destroy;
+        //Debug.Log("Destroy Mode ON");
+        //Debug.Log(GameManagerScript.instance.GameState);
+        GameManagerScript.instance.StartDestroyMode();
     }
 }

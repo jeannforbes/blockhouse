@@ -12,32 +12,13 @@ public class GameManagerScript : MonoBehaviour {
         Destroy
     }
 
-    public GameStates gameState;
+    public  GameStates gameState;
     public Canvas canvas;
 
-    public GameStates GameState {
-        get {
-            return gameState;
-        }
-        set {
-            gameState = value;
-            
-            if (gameState == GameStates.Build) {
-                canvas.GetComponent<CanvasScript>().destroyMode.SetActive(false);
-                canvas.GetComponent<CanvasScript>().buildMode.SetActive(true);
-            }
-            else if (gameState == GameStates.Destroy)
-            {
-                canvas.GetComponent<CanvasScript>().buildMode.SetActive(false);
-                canvas.GetComponent<CanvasScript>().destroyMode.SetActive(true);
-            }
-        }
-    }
-
-
     private Camera mainCamera;
-    private GameObject selectedCube;
-    private GameObject tempCube;
+    public GameObject selectedCube;
+    private GameObject displayCube;
+    private GameObject tempCube; 
 
     public GameObject[] cubes;
     
@@ -60,13 +41,20 @@ public class GameManagerScript : MonoBehaviour {
     void Start () {
         selectedCube = null;
         tempCube = null;
+        displayCube = null;
 
         mainCamera = Camera.main;
 
-        //GameState = GameStates.Build;
-        gameState = GameStates.Destroy;
+        gameState = GameStates.Build;
+        //gameState = GameStates.Destroy;
 
         cubes = GameObject.FindGameObjectsWithTag("Cube");
+
+        SetSurroundingHitboxActive(false);
+        
+        for (int i = 0; i < cubes.Length; i++) {
+            cubes[i].GetComponent<Rigidbody>().isKinematic = true;
+        }
     }
 	
 	// Update is called once per frame
@@ -75,17 +63,14 @@ public class GameManagerScript : MonoBehaviour {
         // DESTROY
         if (gameState == GameStates.Destroy)
         {
-            //Debug.Log("DESTROY");
             // Select Cube
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("Mouse is down");
-
                 RaycastHit hitInfo = new RaycastHit();
                 bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
                 if (hit && hitInfo.transform.gameObject.tag == "Cube")
                 {
-                    Debug.Log("CUBE");
+                    //Debug.Log("CUBE");
                     tempCube = hitInfo.transform.gameObject;
                 }
             }
@@ -113,8 +98,21 @@ public class GameManagerScript : MonoBehaviour {
 
                     // Remove joints
                     FixedJoint[] joints = selectedCube.GetComponents<FixedJoint>();
-                    Debug.Log("WTF: " + joints.Length);
                     for (int i = 0; i < joints.Length; i++) {
+
+                        // Destroy the joints of the cubes connected to selected Cube
+                        CubeScript cScript = joints[i].connectedBody.gameObject.GetComponent<CubeScript>();
+
+                        if (cScript.connectedObjects.Contains(selectedCube)) {
+                            FixedJoint[] fixedJoints = cScript.GetComponents<FixedJoint>();
+
+                            for (int j = 0; j < fixedJoints.Length; j++) {
+                                if (fixedJoints[j].connectedBody.gameObject == selectedCube) {
+                                    Destroy(fixedJoints[j]);
+                                }
+                            }
+                        }
+
                         Destroy(joints[i]);
                     }
 
@@ -126,7 +124,73 @@ public class GameManagerScript : MonoBehaviour {
 
 
         // BUILD
-        if (gameState == GameStates.Build) { }
+        if (gameState == GameStates.Build) {
+            // Select Cube
+            if (Input.GetMouseButtonDown(0))
+            {
+                RaycastHit hitInfo = new RaycastHit();
+
+                bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+                if (hit && hitInfo.transform.gameObject.tag == "Cube") {
+                    //Debug.Log("CUBE");
+                    tempCube = hitInfo.transform.gameObject;
+                }
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                RaycastHit hitInfo = new RaycastHit();
+                bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+                if (hit && hitInfo.transform.gameObject.tag == "Cube" && hitInfo.transform.gameObject == tempCube)
+                {
+                    if (selectedCube == null)
+                    {
+                        SelectCube(hitInfo.transform.gameObject);
+
+                        displayCube = Instantiate(selectedCube);
+                        Destroy(displayCube.GetComponent<BoxCollider>());
+                        Destroy(displayCube.GetComponent<Rigidbody>());
+                        displayCube.transform.GetChild(0).gameObject.SetActive(false);
+                        displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
+
+                        SetSurroundingHitboxActive(true);
+                    }
+
+                    else {
+                        selectedCube.transform.position = displayCube.transform.position;
+
+                        //selectedCube.GetComponent<CubeScript>().IsSelected = false;
+                        //selectedCube = null;
+                        //Destroy(displayCube);
+                        //displayCube = null;
+                        DeselectCube();
+
+
+                    }
+                }
+
+                tempCube = null;
+            }
+
+            // Place the cube
+            if (displayCube != null) {
+                Vector3 mouse = Input.mousePosition;
+                Ray castPoint = Camera.main.ScreenPointToRay(mouse);
+                RaycastHit hitInfo;
+                if (Physics.Raycast(castPoint, out hitInfo)) {
+                    //Debug.Log(hitInfo.transform.gameObject.name);
+                    
+                    Vector3 cubePos = hitInfo.point - (hitInfo.normal/2);
+                    if (hitInfo.transform.gameObject.tag == "Floor") { 
+                         cubePos = hitInfo.point + (hitInfo.normal / 2);  
+                    }
+                    cubePos.x = Mathf.Round(cubePos.x);
+                    cubePos.y = Mathf.Round(cubePos.y);
+                    cubePos.z = Mathf.Round(cubePos.z);
+                    displayCube.transform.position = cubePos;
+                }
+                
+            }
+        }
 
     }
 
@@ -142,11 +206,48 @@ public class GameManagerScript : MonoBehaviour {
 
         selectedCube = cube;
         cube.GetComponent<CubeScript>().IsSelected = true;
-        Debug.Log(selectedCube.name);
+        //Debug.Log(selectedCube.name);
+    }
+
+    public void DeselectCube() {
+        if (selectedCube != null)
+        {
+            selectedCube.GetComponent<CubeScript>().IsSelected = false;
+            selectedCube = null;
+        }
+
+        if (displayCube != null)
+        {
+            Destroy(displayCube);
+            displayCube = null;
+        }
+    }
+
+    public void StartDestroyMode()
+    {
+        //gameState = value;
+        //selectedCube = null;
+        
+        DeselectCube();
+
+        gameState = GameStates.Destroy;
+
+        for (int i = 0; i < cubes.Length; i++)
+        {
+            cubes[i].GetComponent<Rigidbody>().isKinematic = false;
+            cubes[i].transform.GetChild(0).gameObject.SetActive(false);
+        }
+
     }
 
     private Vector2 GetForceFrom(Vector3 fromPos, Vector3 toPos)
     {
         return (new Vector2(toPos.x, toPos.y) - new Vector2(fromPos.x, fromPos.y)) * 2.0f;// shotForce;
+    }
+
+    private void SetSurroundingHitboxActive(bool value) {
+        for (int i = 0; i < cubes.Length; i++) {
+            cubes[i].transform.GetChild(0).gameObject.SetActive(value);
+        }
     }
 }
