@@ -16,6 +16,11 @@ public class GameManagerScript : MonoBehaviour {
     public Canvas canvas;
 
     private Camera mainCamera;
+    public GameObject allCubes;
+
+    public BuildGameManagerScript buildManager;
+    public DestroyGameManagerScript destroyManager;
+
     public GameObject selectedCube;
     private GameObject displayCube;
     private GameObject tempCube; 
@@ -34,7 +39,8 @@ public class GameManagerScript : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(allCubes);
     }
 
     // Use this for initialization
@@ -194,7 +200,7 @@ public class GameManagerScript : MonoBehaviour {
 
     }
 
-    private void SelectCube(GameObject cube) {
+    public void SelectCube(GameObject cube) {
         if (cube == null) {
             selectedCube = null;
             return;

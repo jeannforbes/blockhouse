@@ -30,9 +30,6 @@ public class CubeScript : MonoBehaviour
     }
     void OnCollisionEnter(Collision collisionObj)
     {
-        if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
-            return;
-
         if (collisionObj.gameObject.tag != "Cube")
             return;
 
@@ -57,8 +54,8 @@ public class CubeScript : MonoBehaviour
     }
     void OnCollisionStay(Collision collisionObj)
     {
-        if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
-            return;
+        //if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
+        //    return;
 
         if (collisionObj.gameObject.tag != "Cube")
             return;
