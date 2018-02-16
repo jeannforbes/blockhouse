@@ -22,6 +22,12 @@ public class BuildGameManagerScript : MonoBehaviour
     public float shotForce = 1000.0f;
     private Vector3 fireDirection;
 
+    private float dragSpeed = 600f;
+    private Vector3 dragOrigin;
+
+    public GameObject boundingFloor;
+    public bool cannotPlaceCube;
+
     private void Awake()
     {
         if (instance == null)
@@ -32,8 +38,7 @@ public class BuildGameManagerScript : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
-        //DontDestroyOnLoad(gameObject);
+        
         DontDestroyOnLoad(allCubes);
     }
 
@@ -52,6 +57,7 @@ public class BuildGameManagerScript : MonoBehaviour
 
         for (int i = 0; i < cubes.Length; i++)
         {
+            //cubes[i].GetComponent<Rigidbody>().useGravity = false;
             cubes[i].GetComponent<Rigidbody>().isKinematic = true;
         }
     }
@@ -59,6 +65,8 @@ public class BuildGameManagerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+
         // Select Cube
         if (Input.GetMouseButtonDown(0))
         {
@@ -82,51 +90,81 @@ public class BuildGameManagerScript : MonoBehaviour
                     SelectCube(hitInfo.transform.gameObject);
 
                     displayCube = Instantiate(selectedCube);
-                    Destroy(displayCube.GetComponent<BoxCollider>());
-                    Destroy(displayCube.GetComponent<Rigidbody>());
+                    //Destroy(displayCube.GetComponent<BoxCollider>());
+                    //Destroy(displayCube.GetComponent<Rigidbody>());
                     displayCube.transform.GetChild(0).gameObject.SetActive(false);
                     displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
+                    // turn off isKinematic and freeze rotation and position to allow for collision detection
+                    displayCube.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezePositionY;
+                    displayCube.GetComponent<Rigidbody>().isKinematic = false;
 
-                    SetSurroundingHitboxActive(true);
+                    //SetSurroundingHitboxActive(true);
                 }
 
                 else
                 {
-                    selectedCube.transform.position = displayCube.transform.position;
-
-                    //selectedCube.GetComponent<CubeScript>().IsSelected = false;
-                    //selectedCube = null;
-                    //Destroy(displayCube);
-                    //displayCube = null;
-                    DeselectCube();
-
-
+                    //selectedCube.transform.position = displayCube.transform.position;
+                    //DeselectCube();
                 }
             }
 
             tempCube = null;
         }
 
-        // Place the cube
+        // Move the display cube
         if (displayCube != null)
         {
-            Vector3 mouse = Input.mousePosition;
-            Ray castPoint = Camera.main.ScreenPointToRay(mouse);
-            RaycastHit hitInfo;
-            if (Physics.Raycast(castPoint, out hitInfo))
-            {
-                //Debug.Log(hitInfo.transform.gameObject.name);
+            // Move the cube to distance in front of camera
+            Vector3 cubePos = mainCamera.transform.position + (mainCamera.transform.forward * 5);
+            
+            Renderer rend = boundingFloor.GetComponent<Renderer>();
+            //Debug.Log(rend.bounds.min + " , " + rend.bounds.max);
 
-                Vector3 cubePos = hitInfo.point - (hitInfo.normal / 2);
-                if (hitInfo.transform.gameObject.tag == "Floor")
-                {
-                    cubePos = hitInfo.point + (hitInfo.normal / 2);
-                }
-                cubePos.x = Mathf.Round(cubePos.x);
-                cubePos.y = Mathf.Round(cubePos.y);
-                cubePos.z = Mathf.Round(cubePos.z);
+            // if in bounds, move the cube
+            if (cubePos.x > rend.bounds.min.x &&
+                cubePos.x < rend.bounds.max.x &&
+                cubePos.z > rend.bounds.min.z &&
+                cubePos.z < rend.bounds.max.z &&
+                cubePos.y > 0)
+            {
+
+                // move cube and check for collisions;
                 displayCube.transform.position = cubePos;
+
+                // If colliding with object, don't move
+                if (displayCube.GetComponent<CubeScript>().collidingObjects.Count > 0) {
+                    cannotPlaceCube = true;
+                    displayCube.GetComponent<Renderer>().material.color = new Color(1, 0, 0f, 0.5f);
+                }
+                else {
+                    cannotPlaceCube = false;
+                    displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
+                }
             }
+            
+            // Rotate the cube
+            if (Input.GetMouseButtonDown(0))
+            {
+                dragOrigin = Input.mousePosition;
+                return;
+            }
+
+            if (!Input.GetMouseButton(0)) return;
+            float rotX = Input.GetAxis("Mouse X") * dragSpeed * Mathf.Deg2Rad;
+            float rotY = Input.GetAxis("Mouse Y") * dragSpeed * Mathf.Deg2Rad;
+
+            Vector3 relativeUp = mainCamera.transform.TransformDirection(Vector3.up);
+            Vector3 relativeRight = mainCamera.transform.TransformDirection(Vector3.right);
+
+            //Turns relativeUp vector from world to objects local space
+            Vector3 objectRelativeUp = displayCube.transform.InverseTransformDirection(relativeUp);
+            //Turns relativeRight vector from world to object local space
+            Vector3 objectRelaviveRight = displayCube.transform.InverseTransformDirection(relativeRight);
+
+            Quaternion rotateBy = Quaternion.AngleAxis(-rotX / gameObject.transform.localScale.x, objectRelativeUp)
+                * Quaternion.AngleAxis(rotY / gameObject.transform.localScale.x, objectRelaviveRight);
+
+            displayCube.transform.localRotation *= rotateBy;
 
         }
 
@@ -148,6 +186,13 @@ public class BuildGameManagerScript : MonoBehaviour
         selectedCube = cube;
         cube.GetComponent<CubeScript>().IsSelected = true;
         //Debug.Log(selectedCube.name);
+    }
+
+    public void PlaceCube()
+    {
+        selectedCube.transform.position = displayCube.transform.position;
+        selectedCube.transform.rotation = displayCube.transform.rotation;
+        DeselectCube();
     }
 
     public void DeselectCube()

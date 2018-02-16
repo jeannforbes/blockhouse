@@ -4,32 +4,39 @@ using UnityEngine;
 
 public class CubeScript : MonoBehaviour
 {
-
     public bool isSelected = false;
+
     protected Material cubeMaterial;
 
-    public float connectAngle = 5.5f;
-    public float jointBreakForce = 5.0f;
-    public float jointBreakTorque = 5.0f;
+    public float connectAngle = 505.5f;
+    public float jointBreakForce = 500.0f;
+    public float jointBreakTorque = 500.0f;
 
     //private float checkRadius = 4.0f;
 
+    public List<GameObject> collidingObjects;
     public List<GameObject> connectedObjects;
 
     // Use this for initialization
     void Start()
     {
         cubeMaterial = GetComponent<Renderer>().material;
+
+        collidingObjects = new List<GameObject>();
         connectedObjects = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
     }
+
     void OnCollisionEnter(Collision collisionObj)
     {
+        // Add to colliding objects
+        collidingObjects.Add(collisionObj.gameObject);
+
+        // Check if Cube
         if (collisionObj.gameObject.tag != "Cube")
             return;
 
@@ -54,12 +61,9 @@ public class CubeScript : MonoBehaviour
     }
     void OnCollisionStay(Collision collisionObj)
     {
-        //if (GameManagerScript.instance.gameState == GameManagerScript.GameStates.Build)
-        //    return;
-
         if (collisionObj.gameObject.tag != "Cube")
             return;
-
+        
         // find collision point and normal.
         var point = collisionObj.contacts[0].point;
         var dir = -collisionObj.contacts[0].normal;
@@ -78,6 +82,10 @@ public class CubeScript : MonoBehaviour
                 AddFixedJoint(collisionObj.gameObject);
             }
         }
+    }
+    public void OnCollisionExit(Collision collisionObj)
+    {
+        collidingObjects.Remove(collisionObj.gameObject);
     }
 
     public void AddFixedJoint(GameObject collisionObj) {
