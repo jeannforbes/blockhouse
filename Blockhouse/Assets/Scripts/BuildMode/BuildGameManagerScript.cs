@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BuildGameManagerScript : MonoBehaviour
 {
-
     // singleton-type GameManager
     public static BuildGameManagerScript instance = null;
     
@@ -30,6 +29,7 @@ public class BuildGameManagerScript : MonoBehaviour
 
     private void Awake()
     {
+        // singleton-type setup
         if (instance == null)
         {
             instance = this;
@@ -39,6 +39,7 @@ public class BuildGameManagerScript : MonoBehaviour
             Destroy(gameObject);
         }
         
+        // Place all objects sent to Destroy scene on DontDestroyOnLoad
         DontDestroyOnLoad(allCubes);
     }
 
@@ -65,9 +66,7 @@ public class BuildGameManagerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
-        // Select Cube
+        // SELECT CUBE ON CLICK
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hitInfo = new RaycastHit();
@@ -89,49 +88,42 @@ public class BuildGameManagerScript : MonoBehaviour
                 {
                     SelectCube(hitInfo.transform.gameObject);
 
+                    // create a display cube to simulate where the cube will be placed
                     displayCube = Instantiate(selectedCube);
-                    //Destroy(displayCube.GetComponent<BoxCollider>());
-                    //Destroy(displayCube.GetComponent<Rigidbody>());
                     displayCube.transform.GetChild(0).gameObject.SetActive(false);
                     displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
+
                     // turn off isKinematic and freeze rotation and position to allow for collision detection
                     displayCube.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezePositionY;
                     displayCube.GetComponent<Rigidbody>().isKinematic = false;
 
                     //SetSurroundingHitboxActive(true);
                 }
-
-                else
-                {
-                    //selectedCube.transform.position = displayCube.transform.position;
-                    //DeselectCube();
-                }
             }
 
             tempCube = null;
         }
 
-        // Move the display cube
+        // MOVE DISPLAY CUBE IN RELATION TO CAMERA
         if (displayCube != null)
         {
             // Move the cube to distance in front of camera
             Vector3 cubePos = mainCamera.transform.position + (mainCamera.transform.forward * 5);
-            
-            Renderer rend = boundingFloor.GetComponent<Renderer>();
-            //Debug.Log(rend.bounds.min + " , " + rend.bounds.max);
 
             // if in bounds, move the cube
+            Renderer rend = boundingFloor.GetComponent<Renderer>();
+
             if (cubePos.x > rend.bounds.min.x &&
                 cubePos.x < rend.bounds.max.x &&
                 cubePos.z > rend.bounds.min.z &&
                 cubePos.z < rend.bounds.max.z &&
                 cubePos.y > 0)
             {
-
                 // move cube and check for collisions;
                 displayCube.transform.position = cubePos;
 
-                // If colliding with object, don't move
+                // check if display cube is colliding with other objects
+                // cannot place the cube if it is colliding
                 if (displayCube.GetComponent<CubeScript>().collidingObjects.Count > 0) {
                     cannotPlaceCube = true;
                     displayCube.GetComponent<Renderer>().material.color = new Color(1, 0, 0f, 0.5f);
@@ -142,7 +134,7 @@ public class BuildGameManagerScript : MonoBehaviour
                 }
             }
             
-            // Rotate the cube
+            // Rotate the cube on drag
             if (Input.GetMouseButtonDown(0))
             {
                 dragOrigin = Input.mousePosition;
@@ -210,6 +202,7 @@ public class BuildGameManagerScript : MonoBehaviour
         }
     }
 
+    // All things necessary for switching scene to Destroy mode
     public void StartDestroyMode()
     {
         DeselectCube();
@@ -220,11 +213,6 @@ public class BuildGameManagerScript : MonoBehaviour
             cubes[i].transform.GetChild(0).gameObject.SetActive(false);
         }
 
-    }
-
-    private Vector2 GetForceFrom(Vector3 fromPos, Vector3 toPos)
-    {
-        return (new Vector2(toPos.x, toPos.y) - new Vector2(fromPos.x, fromPos.y)) * 2.0f;// shotForce;
     }
 
     private void SetSurroundingHitboxActive(bool value)
