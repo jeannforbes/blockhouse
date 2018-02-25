@@ -11,6 +11,7 @@ public class BuildGameManagerScript : MonoBehaviour
 
     private Camera mainCamera;
     public GameObject allCubes;
+    public GameObject allBoundingFloors;
 
     public GameObject selectedCube;
     private GameObject displayCube;
@@ -24,7 +25,11 @@ public class BuildGameManagerScript : MonoBehaviour
     private float dragSpeed = 600f;
     private Vector3 dragOrigin;
 
-    public GameObject boundingFloor;
+    public int numTeams;
+    public int currentTeam = 0;
+    
+    public GameObject[] boundingFloors;
+
     public bool cannotPlaceCube;
 
     private void Awake()
@@ -41,6 +46,7 @@ public class BuildGameManagerScript : MonoBehaviour
         
         // Place all objects sent to Destroy scene on DontDestroyOnLoad
         DontDestroyOnLoad(allCubes);
+        DontDestroyOnLoad(allBoundingFloors);
     }
 
     // Use this for initialization
@@ -52,27 +58,58 @@ public class BuildGameManagerScript : MonoBehaviour
 
         mainCamera = Camera.main;
 
+
+        // Set team colors
+        numTeams = 2;
+        Color team0Color = Color.red;
+        Color team1Color = Color.blue;
+
         cubes = GameObject.FindGameObjectsWithTag("Cube");
 
         SetSurroundingHitboxActive(false);
 
         for (int i = 0; i < cubes.Length; i++)
         {
-            //cubes[i].GetComponent<Rigidbody>().useGravity = false;
             cubes[i].GetComponent<Rigidbody>().isKinematic = true;
+
+            // set the team colors
+            ObjectScript oScript = cubes[i].GetComponent<ObjectScript>();
+            switch (oScript.team) {
+                case 0:
+                    oScript.teamColor = team0Color;
+                    break;
+                case 1:
+                    oScript.teamColor = team1Color;
+                    break;
+            }
+
+            oScript.objectMaterial.color = oScript.teamColor;
         }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        // SELECT CUBE ON CLICK
-        if (Input.GetMouseButtonDown(0))
+        // SWITCH TEAMS BY PRESSING Q
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            if (selectedCube != null)
+                DeselectCube();
+
+            currentTeam++;
+            currentTeam = currentTeam % numTeams;
+        }
+
+            // SELECT CUBE ON CLICK
+            if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hitInfo = new RaycastHit();
 
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
-            if (hit && hitInfo.transform.gameObject.tag == "Cube")
+            if (hit && hitInfo.transform.gameObject.tag == "Cube" &&
+                hitInfo.transform.gameObject.GetComponent<CubeScript>() != null  &&
+                hitInfo.transform.gameObject.GetComponent<CubeScript>().team == currentTeam)
             {
                 //Debug.Log("CUBE");
                 tempCube = hitInfo.transform.gameObject;
@@ -82,7 +119,9 @@ public class BuildGameManagerScript : MonoBehaviour
         {
             RaycastHit hitInfo = new RaycastHit();
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
-            if (hit && hitInfo.transform.gameObject.tag == "Cube" && hitInfo.transform.gameObject == tempCube)
+            if (hit && hitInfo.transform.gameObject.tag == "Cube" && hitInfo.transform.gameObject == tempCube &&
+                hitInfo.transform.gameObject.GetComponent<CubeScript>() != null &&
+                hitInfo.transform.gameObject.GetComponent<CubeScript>().team == currentTeam)
             {
                 if (selectedCube == null)
                 {
@@ -111,7 +150,7 @@ public class BuildGameManagerScript : MonoBehaviour
             Vector3 cubePos = mainCamera.transform.position + (mainCamera.transform.forward * 5);
 
             // if in bounds, move the cube
-            Renderer rend = boundingFloor.GetComponent<Renderer>();
+            Renderer rend = boundingFloors[currentTeam].GetComponent<Renderer>();
 
             if (cubePos.x > rend.bounds.min.x &&
                 cubePos.x < rend.bounds.max.x &&

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CubeScript : MonoBehaviour
+public class CubeScript : ObjectScript
 {
     public bool isSelected = false;
-
-    protected Material cubeMaterial;
-
+    
     public float connectAngle = 505.5f;
     public float jointBreakForce = 500.0f;
     public float jointBreakTorque = 500.0f;
@@ -18,16 +16,16 @@ public class CubeScript : MonoBehaviour
     public List<GameObject> connectedObjects;
 
     // Use this for initialization
-    void Start()
+    public override void Start()
     {
-        cubeMaterial = GetComponent<Renderer>().material;
+        objectMaterial = GetComponent<Renderer>().material;
 
         collidingObjects = new List<GameObject>();
         connectedObjects = new List<GameObject>();
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
     }
 
@@ -40,46 +38,61 @@ public class CubeScript : MonoBehaviour
         if (collisionObj.gameObject.tag != "Cube")
             return;
 
-        // find collision point and normal.
-        var point = collisionObj.contacts[0].point;
-        var dir = -collisionObj.contacts[0].normal;
-        point -= dir;
-        RaycastHit hitInfo;
-        if (collisionObj.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
-        {
-            var normal = hitInfo.normal;
-            var angle = Vector3.Angle(-transform.forward, normal);
-            var diffAngle = angle % 90;
+        // get fin the team of the object
+        int objTeam = collisionObj.gameObject.GetComponent<ObjectScript>().team;
 
-            //Debug.Log("ANGLE: " + angle);
-            //Debug.Log(diffAngle);
-            if (diffAngle < connectAngle)
+        // if on the same team, create joint when touching
+        if (objTeam == team)
+        {
+            // find collision point and normal.
+            var point = collisionObj.contacts[0].point;
+            var dir = -collisionObj.contacts[0].normal;
+            point -= dir;
+            RaycastHit hitInfo;
+            if (collisionObj.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
             {
-                AddFixedJoint(collisionObj.gameObject);
+                var normal = hitInfo.normal;
+                var angle = Vector3.Angle(-transform.forward, normal);
+                var diffAngle = angle % 90;
+
+                //Debug.Log("ANGLE: " + angle);
+                //Debug.Log(diffAngle);
+                if (diffAngle < connectAngle)
+                {
+                    AddFixedJoint(collisionObj.gameObject);
+                }
             }
         }
     }
+    // Do the same thing in CollisionStay as CollisionEnter because one sometimes misses what the other catches.
     void OnCollisionStay(Collision collisionObj)
     {
         if (collisionObj.gameObject.tag != "Cube")
             return;
-        
-        // find collision point and normal.
-        var point = collisionObj.contacts[0].point;
-        var dir = -collisionObj.contacts[0].normal;
-        point -= dir;
-        RaycastHit hitInfo;
-        if (collisionObj.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
-        {
-            var normal = hitInfo.normal;
-            var angle = Vector3.Angle(-transform.forward, normal);
-            var diffAngle = angle % 90;
 
-            //Debug.Log("ANGLE: " + angle);
-            //Debug.Log(diffAngle);
-            if (diffAngle < connectAngle)
+        // get fin the team of the object
+        int objTeam = collisionObj.gameObject.GetComponent<ObjectScript>().team;
+
+        // if on the same team, create joint when touching
+        if (objTeam == team)
+        {
+            // find collision point and normal.
+            var point = collisionObj.contacts[0].point;
+            var dir = -collisionObj.contacts[0].normal;
+            point -= dir;
+            RaycastHit hitInfo;
+            if (collisionObj.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
             {
-                AddFixedJoint(collisionObj.gameObject);
+                var normal = hitInfo.normal;
+                var angle = Vector3.Angle(-transform.forward, normal);
+                var diffAngle = angle % 90;
+
+                //Debug.Log("ANGLE: " + angle);
+                //Debug.Log(diffAngle);
+                if (diffAngle < connectAngle)
+                {
+                    AddFixedJoint(collisionObj.gameObject);
+                }
             }
         }
     }
@@ -115,11 +128,13 @@ public class CubeScript : MonoBehaviour
         {
             this.isSelected = value;
 
-            if (isSelected) {
-                cubeMaterial.color = Color.red;
+            if (isSelected)
+            {
+                objectMaterial.color = Color.white;
             }
-            else {
-                cubeMaterial.color = Color.white;
+            else
+            {
+                objectMaterial.color = teamColor;
             }
         }
     }

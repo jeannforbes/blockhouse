@@ -10,6 +10,8 @@ public class DestroyGameManagerScript : MonoBehaviour
     
     public Canvas canvas;
 
+    public GameObject allBoundingFloors;
+
     private Camera mainCamera;
     public GameObject allCubes;
 
@@ -19,7 +21,12 @@ public class DestroyGameManagerScript : MonoBehaviour
 
     public GameObject[] cubes;
 
-    public float shotForce = 1000.0f;
+    public GameObject[] boundingFloors;
+
+    public int numTeams;
+    public int currentTeam = 0;
+
+    public float shotForce = 100000.0f;
     private Vector3 fireDirection;
 
     private void Awake()
@@ -34,7 +41,7 @@ public class DestroyGameManagerScript : MonoBehaviour
         }
 
         //DontDestroyOnLoad(gameObject);
-        DontDestroyOnLoad(allCubes);
+        //DontDestroyOnLoad(allCubes);
     }
 
     // Use this for initialization
@@ -48,6 +55,15 @@ public class DestroyGameManagerScript : MonoBehaviour
 
         allCubes = GameObject.FindGameObjectWithTag("AllCubes");
 
+        allBoundingFloors = GameObject.FindGameObjectWithTag("AllBoundingFloors");
+
+        numTeams = allBoundingFloors.transform.childCount;
+
+        boundingFloors = new GameObject[numTeams];
+        for (int i = 0; i < boundingFloors.Length; i++) {
+            boundingFloors[i] = allBoundingFloors.transform.GetChild(i).gameObject;
+        }
+
         cubes = GameObject.FindGameObjectsWithTag("Cube");
 
         for (int i = 0; i < cubes.Length; i++)
@@ -59,6 +75,15 @@ public class DestroyGameManagerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // SWITCH TEAMS BY PRESSING Q
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            if (selectedCube != null)
+                DeselectCube();
+
+            currentTeam++;
+            currentTeam = currentTeam % numTeams;
+        }
 
         // Select Cube
         if (Input.GetMouseButtonDown(0))
@@ -67,8 +92,20 @@ public class DestroyGameManagerScript : MonoBehaviour
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
             if (hit && hitInfo.transform.gameObject.tag == "Cube")
             {
-                //Debug.Log("CUBE");
-                tempCube = hitInfo.transform.gameObject;
+                Vector3 cubePos = hitInfo.transform.position;
+
+                // if in bounds, move the cube
+                Renderer rend = boundingFloors[currentTeam].GetComponent<Renderer>();
+
+                if (cubePos.x > rend.bounds.min.x &&
+                    cubePos.x < rend.bounds.max.x &&
+                    cubePos.z > rend.bounds.min.z &&
+                    cubePos.z < rend.bounds.max.z &&
+                    cubePos.y > 0)
+                {
+                    //Debug.Log("CUBE");
+                    tempCube = hitInfo.transform.gameObject;
+                }
             }
         }
         if (Input.GetMouseButtonUp(0))
@@ -77,7 +114,19 @@ public class DestroyGameManagerScript : MonoBehaviour
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
             if (hit && hitInfo.transform.gameObject.tag == "Cube" && hitInfo.transform.gameObject == tempCube)
             {
-                SelectCube(hitInfo.transform.gameObject);
+                Vector3 cubePos = hitInfo.transform.position;
+
+                // if in bounds, move the cube
+                Renderer rend = boundingFloors[currentTeam].GetComponent<Renderer>();
+
+                if (cubePos.x > rend.bounds.min.x &&
+                    cubePos.x < rend.bounds.max.x &&
+                    cubePos.z > rend.bounds.min.z &&
+                    cubePos.z < rend.bounds.max.z &&
+                    cubePos.y > 0)
+                {
+                    SelectCube(hitInfo.transform.gameObject);
+                }
             }
 
             tempCube = null;
@@ -119,6 +168,8 @@ public class DestroyGameManagerScript : MonoBehaviour
 
                 Vector3 shotVector = fireDirection * shotForce;
                 selectedCube.GetComponent<Rigidbody>().AddForce(shotVector);
+
+                DeselectCube();
             }
         }
     }
