@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
-    public float speed = 2.0f;
+    public float speed = 10.0f;
     private float X;
     private float Y;
 
@@ -29,22 +29,24 @@ public class CameraScript : MonoBehaviour
         // Movement
             // Forward
         if (Input.GetKey(KeyCode.W)) {
-            Vector3 m = transform.forward * speed * Time.deltaTime;
+            Vector3 m = Vector3.forward * speed * Time.deltaTime;
             transform.Translate(m);
         }
             //Backward
         if (Input.GetKey(KeyCode.S)) {
-            Vector3 m = -transform.forward * speed * Time.deltaTime;
+            Vector3 m = -Vector3.forward * speed * Time.deltaTime;
             transform.Translate(m);
         }
             // Strafe Left
         if (Input.GetKey(KeyCode.A)) {
-            Vector3 m = Vector3.Cross(transform.forward, transform.up) * speed * Time.deltaTime;
+            //Vector3 m = Vector3.Cross(transform.forward, transform.up) * speed * Time.deltaTime;
+            Vector3 m = Vector3.left * speed * Time.deltaTime;
             transform.Translate(m);
         }
             // Strafe Right
         if (Input.GetKey(KeyCode.D)) {
-            Vector3 m = -Vector3.Cross(transform.forward, transform.up) * speed * Time.deltaTime;
+            //Vector3 m = -Vector3.Cross(transform.forward, transform.up) * speed * Time.deltaTime;
+            Vector3 m = Vector3.right * speed * Time.deltaTime;
             transform.Translate(m);
         }
         // Strafe Up

@@ -17,9 +17,7 @@ public class BuildMode_StartDestroyMode : MonoBehaviour {
 	}
 
     public void StartDestroyMode(int sceneIndex) {
-        Debug.Log("HAHAHHAHA");
         BuildGameManagerScript.instance.StartDestroyMode();
-
         SceneManager.LoadScene(sceneIndex);
     }
 }

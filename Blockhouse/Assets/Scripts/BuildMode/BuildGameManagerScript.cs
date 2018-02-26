@@ -12,12 +12,14 @@ public class BuildGameManagerScript : MonoBehaviour
     private Camera mainCamera;
     public GameObject allCubes;
     public GameObject allBoundingFloors;
+    public GameObject allEggs;
 
     public GameObject selectedCube;
     private GameObject displayCube;
     private GameObject tempCube;
 
     public GameObject[] cubes;
+    public GameObject[] eggs;
 
     public float shotForce = 1000.0f;
     private Vector3 fireDirection;
@@ -47,6 +49,7 @@ public class BuildGameManagerScript : MonoBehaviour
         // Place all objects sent to Destroy scene on DontDestroyOnLoad
         DontDestroyOnLoad(allCubes);
         DontDestroyOnLoad(allBoundingFloors);
+        DontDestroyOnLoad(allEggs);
     }
 
     // Use this for initialization
@@ -64,6 +67,7 @@ public class BuildGameManagerScript : MonoBehaviour
         Color team0Color = Color.red;
         Color team1Color = Color.blue;
 
+        // Cubes
         cubes = GameObject.FindGameObjectsWithTag("Cube");
 
         SetSurroundingHitboxActive(false);
@@ -74,7 +78,8 @@ public class BuildGameManagerScript : MonoBehaviour
 
             // set the team colors
             ObjectScript oScript = cubes[i].GetComponent<ObjectScript>();
-            switch (oScript.team) {
+            switch (oScript.team)
+            {
                 case 0:
                     oScript.teamColor = team0Color;
                     break;
@@ -82,10 +87,31 @@ public class BuildGameManagerScript : MonoBehaviour
                     oScript.teamColor = team1Color;
                     break;
             }
-
             oScript.objectMaterial.color = oScript.teamColor;
         }
 
+        // Eggs
+        eggs = GameObject.FindGameObjectsWithTag("Egg");
+
+        SetSurroundingHitboxActive(false);
+
+        for (int i = 0; i < eggs.Length; i++)
+        {
+            eggs[i].GetComponent<Rigidbody>().isKinematic = true;
+
+            // set the team colors
+            ObjectScript oScript = eggs[i].GetComponent<ObjectScript>();
+            switch (oScript.team)
+            {
+                case 0:
+                    oScript.teamColor = team0Color;
+                    break;
+                case 1:
+                    oScript.teamColor = team1Color;
+                    break;
+            }
+            oScript.objectMaterial.color = oScript.teamColor;
+        }
     }
 
     // Update is called once per frame
@@ -258,7 +284,10 @@ public class BuildGameManagerScript : MonoBehaviour
     {
         for (int i = 0; i < cubes.Length; i++)
         {
-            cubes[i].transform.GetChild(0).gameObject.SetActive(value);
+            if (cubes[i].transform.childCount != 0)
+            {
+                cubes[i].transform.GetChild(0).gameObject.SetActive(value);
+            }
         }
     }
 }
