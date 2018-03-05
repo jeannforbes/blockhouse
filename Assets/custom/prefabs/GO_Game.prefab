@@ -57,6 +57,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4969278715490224}
+  - component: {fileID: 114241837042739444}
   m_Layer: 0
   m_Name: GO_Game
   m_TagString: Untagged
@@ -157,7 +158,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1117227289689816}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -2.5}
+  m_LocalPosition: {x: 0, y: -2, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4274678353867092}
@@ -285,6 +286,18 @@ MonoBehaviour:
   mSelectedStageType: 0
   mPlaneReference: {fileID: 0}
   mMidAirReference: {fileID: 0}
+--- !u!114 &114241837042739444
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1117227289689816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75878d0fcb109479e8fd4af2812a3f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BeTheOnlyOne: 0
 --- !u!114 &114424442789096170
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -328,7 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1525de7b18e8b146b5ef691812b1a6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numBlocksToSpawn: 10
+  numBlocksToSpawn: 100
   blocks:
   - {fileID: 1188901297759246, guid: 42c1520a4fcc55a408f6034a417efcd6, type: 2}
   - {fileID: 1246359663481970, guid: 0cca13692b8f1d445ac00579f69a87e8, type: 2}

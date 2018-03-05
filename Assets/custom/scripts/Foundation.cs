@@ -21,12 +21,12 @@ public class Foundation : MonoBehaviour {
 	void Update () {
         if (!this.blocksSpawned)
         {
-            Invoke("SpawnBlocks", 3f);
+            Invoke("SpawnBlocks", 10f);
             this.blocksSpawned = true;
         }
         else if (!this.throwingEnabled)
         {
-            Invoke("EnableThrowing", 18f);
+            Invoke("EnableThrowing", 30f);
             this.throwingEnabled = true;
         }
     }
