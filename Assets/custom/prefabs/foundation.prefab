@@ -9,47 +9,46 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1188901297759246}
+  m_RootGameObject: {fileID: 1600011707350906}
   m_IsPrefabParent: 1
---- !u!1 &1188901297759246
+--- !u!1 &1600011707350906
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4728100276708470}
-  - component: {fileID: 33910703220004014}
-  - component: {fileID: 65021060286696862}
-  - component: {fileID: 23245086314865422}
-  - component: {fileID: 54670134038930738}
-  - component: {fileID: 114265283778660024}
+  - component: {fileID: 4056619672048228}
+  - component: {fileID: 33779162607522712}
+  - component: {fileID: 65510579049138334}
+  - component: {fileID: 23085306907231702}
+  - component: {fileID: 114648310514882498}
   m_Layer: 0
-  m_Name: Block_blue
+  m_Name: foundation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4728100276708470
+--- !u!4 &4056619672048228
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.201, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_GameObject: {fileID: 1600011707350906}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.4, y: 0.02, z: 1.4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &23245086314865422
+--- !u!23 &23085306907231702
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
+  m_GameObject: {fileID: 1600011707350906}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -58,7 +57,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 3a4d6ed7cf272794a94ff164d2c09d88, type: 2}
+  - {fileID: 2100000, guid: 29626c6f97beec34cbc768afbb877b0c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -78,48 +77,40 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!33 &33910703220004014
+--- !u!33 &33779162607522712
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
+  m_GameObject: {fileID: 1600011707350906}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!54 &54670134038930738
-Rigidbody:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &65021060286696862
+--- !u!65 &65510579049138334
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
+  m_GameObject: {fileID: 1600011707350906}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114265283778660024
+--- !u!114 &114648310514882498
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1188901297759246}
+  m_GameObject: {fileID: 1600011707350906}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d47482781e91e7f47a78162646f0821b, type: 3}
+  m_Script: {fileID: 11500000, guid: c1525de7b18e8b146b5ef691812b1a6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  numBlocksToSpawn: 20
+  blocks:
+  - {fileID: 1188901297759246, guid: 42c1520a4fcc55a408f6034a417efcd6, type: 2}
+  - {fileID: 1246359663481970, guid: 0cca13692b8f1d445ac00579f69a87e8, type: 2}
+  - {fileID: 1713502577814700, guid: 52eda0936cdb30e4db9f32f4b378fbff, type: 2}
+  - {fileID: 1541963378692462, guid: fd42994258a7a7a4587d82054c47de7c, type: 2}
+  - {fileID: 1658092840213030, guid: 97714ebcbb92a694bade570e14079eed, type: 2}

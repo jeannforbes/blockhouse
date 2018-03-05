@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - GroundPlaneStage
+  - Block
+  - StartButton
+  - Instructions
   layers:
   - Default
   - TransparentFX

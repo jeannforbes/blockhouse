@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 33526103905819684}
   - component: {fileID: 65116536140229634}
   - component: {fileID: 23062317351494596}
+  - component: {fileID: 114476913179844584}
   m_Layer: 0
   m_Name: foundation
   m_TagString: Untagged
@@ -53,7 +54,7 @@ Transform:
   m_GameObject: {fileID: 1098153159460290}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.02, z: 1}
+  m_LocalScale: {x: 1.4, y: 0.02, z: 1.4}
   m_Children: []
   m_Father: {fileID: 4395608202618360}
   m_RootOrder: 0
@@ -125,6 +126,24 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114476913179844584
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1098153159460290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1525de7b18e8b146b5ef691812b1a6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numBlocksToSpawn: 10
+  blocks:
+  - {fileID: 1188901297759246, guid: 42c1520a4fcc55a408f6034a417efcd6, type: 2}
+  - {fileID: 1246359663481970, guid: 0cca13692b8f1d445ac00579f69a87e8, type: 2}
+  - {fileID: 1713502577814700, guid: 52eda0936cdb30e4db9f32f4b378fbff, type: 2}
+  - {fileID: 1541963378692462, guid: fd42994258a7a7a4587d82054c47de7c, type: 2}
+  - {fileID: 1658092840213030, guid: 97714ebcbb92a694bade570e14079eed, type: 2}
 --- !u!114 &114800299798456104
 MonoBehaviour:
   m_ObjectHideFlags: 1
