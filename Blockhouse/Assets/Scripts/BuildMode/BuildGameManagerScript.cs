@@ -70,7 +70,7 @@ public class BuildGameManagerScript : MonoBehaviour
         // Cubes
         cubes = GameObject.FindGameObjectsWithTag("Cube");
 
-        SetSurroundingHitboxActive(false);
+        //SetSurroundingHitboxActive(false);
 
         for (int i = 0; i < cubes.Length; i++)
         {
@@ -88,12 +88,13 @@ public class BuildGameManagerScript : MonoBehaviour
                     break;
             }
             oScript.objectMaterial.color = oScript.teamColor;
+            oScript.SetChildrenColor();
         }
 
         // Eggs
         eggs = GameObject.FindGameObjectsWithTag("Egg");
 
-        SetSurroundingHitboxActive(false);
+        //SetSurroundingHitboxActive(false);
 
         for (int i = 0; i < eggs.Length; i++)
         {
@@ -155,7 +156,7 @@ public class BuildGameManagerScript : MonoBehaviour
 
                     // create a display cube to simulate where the cube will be placed
                     displayCube = Instantiate(selectedCube);
-                    displayCube.transform.GetChild(0).gameObject.SetActive(false);
+                    //displayCube.transform.GetChild(0).gameObject.SetActive(false);
                     displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
 
                     // turn off isKinematic and freeze rotation and position to allow for collision detection
@@ -275,11 +276,11 @@ public class BuildGameManagerScript : MonoBehaviour
         for (int i = 0; i < cubes.Length; i++)
         {
             cubes[i].GetComponent<Rigidbody>().isKinematic = false;
-            cubes[i].transform.GetChild(0).gameObject.SetActive(false);
+            //cubes[i].transform.GetChild(0).gameObject.SetActive(false);
         }
 
     }
-
+    /*
     private void SetSurroundingHitboxActive(bool value)
     {
         for (int i = 0; i < cubes.Length; i++)
@@ -290,4 +291,5 @@ public class BuildGameManagerScript : MonoBehaviour
             }
         }
     }
+    */
 }

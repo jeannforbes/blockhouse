@@ -6,14 +6,16 @@ public class CubeScript : ObjectScript
 {
     public bool isSelected = false;
     
-    public float connectAngle = 505.5f;
-    public float jointBreakForce = 500.0f;
-    public float jointBreakTorque = 500.0f;
+    public float connectAngle = 5.5f;
+    public float jointBreakForce = 50.0f;
+    public float jointBreakTorque = 50.0f;
 
     //private float checkRadius = 4.0f;
 
     public List<GameObject> collidingObjects;
     public List<GameObject> connectedObjects;
+
+    public bool shatterable;
 
     // Use this for initialization
     public override void Start()
@@ -34,10 +36,42 @@ public class CubeScript : ObjectScript
         // Add to colliding objects
         collidingObjects.Add(collisionObj.gameObject);
 
+
+        //Debug.Log(collisionObj.relativeVelocity.magnitude);
+        if (shatterable && collisionObj.relativeVelocity.magnitude > 50) {
+            // Shatter
+            Debug.Log("SHATTER");
+            
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                GameObject child = transform.GetChild(i).gameObject;
+
+                //transform.GetChild(i).parent = null;
+                child.tag = "Cube";
+                child.SetActive(true);
+                child.GetComponent<CubeScript>().team = team;
+                child.GetComponent<CubeScript>().shatterable = false;
+                child.GetComponent<BoxCollider>().enabled = true;
+                child.GetComponent<CubeScript>().enabled = true;
+                child.AddComponent<Rigidbody>();
+                
+            }
+            transform.DetachChildren();
+            Destroy(gameObject);
+            DestroyGameManagerScript.instance.cubes = GameObject.FindGameObjectsWithTag("Cube");
+        }
+
         // Check if Cube
-        if (collisionObj.gameObject.tag != "Cube")
+        if (collisionObj.gameObject.tag != "Cube" && collisionObj.gameObject.GetComponent<ObjectScript>() == null)
             return;
 
+
+        if (collisionObj.gameObject.GetComponent<ObjectScript>() == null)
+        {
+            //Debug.Log("AAA");
+            //Debug.Log(collisionObj.gameObject);
+            //Debug.Log(collisionObj.gameObject.GetComponent<ObjectScript>().team);
+        }
         // get fin the team of the object
         int objTeam = collisionObj.gameObject.GetComponent<ObjectScript>().team;
 
@@ -67,10 +101,14 @@ public class CubeScript : ObjectScript
     // Do the same thing in CollisionStay as CollisionEnter because one sometimes misses what the other catches.
     void OnCollisionStay(Collision collisionObj)
     {
-        if (collisionObj.gameObject.tag != "Cube")
+        if (collisionObj.gameObject.tag != "Cube" && collisionObj.gameObject.GetComponent<ObjectScript>() == null)
             return;
 
         // get fin the team of the object
+        //Debug.Log(collisionObj.gameObject.GetComponent<ObjectScript>());
+        if (collisionObj.gameObject.GetComponent<ObjectScript>() == null ) {
+            Debug.Log(collisionObj.gameObject.GetComponent<ObjectScript>().team);
+        }
         int objTeam = collisionObj.gameObject.GetComponent<ObjectScript>().team;
 
         // if on the same team, create joint when touching
@@ -131,10 +169,12 @@ public class CubeScript : ObjectScript
             if (isSelected)
             {
                 objectMaterial.color = Color.white;
+                SetChildrenColor();
             }
             else
             {
                 objectMaterial.color = teamColor;
+                SetChildrenColor();
             }
         }
     }

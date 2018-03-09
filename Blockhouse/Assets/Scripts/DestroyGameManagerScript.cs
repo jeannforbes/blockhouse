@@ -105,6 +105,7 @@ public class DestroyGameManagerScript : MonoBehaviour
                 {
                     //Debug.Log("CUBE");
                     tempCube = hitInfo.transform.gameObject;
+
                 }
             }
         }
@@ -112,6 +113,10 @@ public class DestroyGameManagerScript : MonoBehaviour
         {
             RaycastHit hitInfo = new RaycastHit();
             bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+
+            if (hit && hitInfo.transform.gameObject.tag == "Cube") {
+            }
+
             if (hit && hitInfo.transform.gameObject.tag == "Cube" && hitInfo.transform.gameObject == tempCube)
             {
                 Vector3 cubePos = hitInfo.transform.position;
@@ -184,6 +189,10 @@ public class DestroyGameManagerScript : MonoBehaviour
 
         for (int i = 0; i < cubes.Length; i++)
         {
+            if (cubes[i] == null) {
+                Debug.Log("not here anymore");
+                continue;
+            }
             cubes[i].GetComponent<CubeScript>().IsSelected = false;
         }
 

@@ -17,4 +17,16 @@ public class ObjectScript : MonoBehaviour {
     public virtual void Update () {
 		
 	}
+
+    public void SetChildrenColor()
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform t = transform.GetChild(i);
+            if (t.gameObject.GetComponent<Renderer>() != null)
+            {
+                t.gameObject.GetComponent<Renderer>().material.color = objectMaterial.color;
+            }
+        }
+    }
 }
