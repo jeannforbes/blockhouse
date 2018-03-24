@@ -127,8 +127,7 @@ public class DestroyGameManagerScript : MonoBehaviour
                 if (cubePos.x > rend.bounds.min.x &&
                     cubePos.x < rend.bounds.max.x &&
                     cubePos.z > rend.bounds.min.z &&
-                    cubePos.z < rend.bounds.max.z &&
-                    cubePos.y > 0)
+                    cubePos.z < rend.bounds.max.z)
                 {
                     SelectCube(hitInfo.transform.gameObject);
                 }
