@@ -150,6 +150,7 @@ public class BuildGameManagerScript : MonoBehaviour
                 hitInfo.transform.gameObject.GetComponent<CubeScript>() != null &&
                 hitInfo.transform.gameObject.GetComponent<CubeScript>().team == currentTeam)
             {
+                //Debug.Log("HIT CUBE");
                 if (selectedCube == null)
                 {
                     SelectCube(hitInfo.transform.gameObject);
