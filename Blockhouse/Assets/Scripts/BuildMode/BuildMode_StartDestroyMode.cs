@@ -5,9 +5,8 @@ using UnityEngine.SceneManagement;
 
 
 public class BuildMode_StartDestroyMode : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	

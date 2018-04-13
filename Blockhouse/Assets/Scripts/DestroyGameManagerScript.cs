@@ -9,6 +9,7 @@ public class DestroyGameManagerScript : MonoBehaviour
     public static DestroyGameManagerScript instance = null;
     
     public Canvas canvas;
+    public DestroyMode_CanvasScript canvasScript;
 
     public GameObject allBoundingFloors;
 
@@ -22,12 +23,16 @@ public class DestroyGameManagerScript : MonoBehaviour
     public GameObject[] cubes;
 
     public GameObject[] boundingFloors;
+    public EggScript[] eggs;
+    
 
     public int numTeams;
     public int currentTeam = 0;
 
     public float shotForce = 100000.0f;
     private Vector3 fireDirection;
+
+    public bool gameOver = false;
 
     private void Awake()
     {
@@ -53,8 +58,13 @@ public class DestroyGameManagerScript : MonoBehaviour
 
         mainCamera = Camera.main;
 
-        allCubes = GameObject.FindGameObjectWithTag("AllCubes");
+        if (canvas != null)
+        {
+            canvasScript = canvas.GetComponent<DestroyMode_CanvasScript>();
+            canvasScript.ChangeText("Team " + currentTeam);
+        }
 
+        allCubes = GameObject.FindGameObjectWithTag("AllCubes");
         allBoundingFloors = GameObject.FindGameObjectWithTag("AllBoundingFloors");
 
         numTeams = allBoundingFloors.transform.childCount;
@@ -70,20 +80,31 @@ public class DestroyGameManagerScript : MonoBehaviour
         {
             cubes[i].GetComponent<Rigidbody>().isKinematic = false;
         }
+
+
+        GameObject[] allEggs = GameObject.FindGameObjectsWithTag("Egg");
+        eggs = new EggScript[numTeams];
+        for (int i = 0; i < numTeams; i++) {
+            EggScript eScript = allEggs[i].GetComponent<EggScript>();
+            eggs[eScript.team] = eScript;
+        }
+
+        UpdateHealth();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (gameOver)
+            return;
+
+        /*
         // SWITCH TEAMS BY PRESSING Q
         if (Input.GetKeyUp(KeyCode.Q))
         {
-            if (selectedCube != null)
-                DeselectCube();
-
-            currentTeam++;
-            currentTeam = currentTeam % numTeams;
+            ChangeTeams();
         }
+        */
 
         // Select Cube
         if (Input.GetMouseButtonDown(0))
@@ -173,6 +194,9 @@ public class DestroyGameManagerScript : MonoBehaviour
                 selectedCube.GetComponent<Rigidbody>().AddForce(shotVector);
 
                 DeselectCube();
+
+                // Change teams after throwing the cube
+                ChangeTeams();
             }
         }
     }
@@ -212,6 +236,43 @@ public class DestroyGameManagerScript : MonoBehaviour
             Destroy(displayCube);
             displayCube = null;
         }
+    }
+
+    public void ChangeTeams()
+    {
+        if (selectedCube != null)
+            DeselectCube();
+
+        currentTeam = (currentTeam + 1) % numTeams;
+        canvasScript.ChangeText("Team " + currentTeam);
+
+        // Move camera to appropriate position
+        Vector3 newCamPos = eggs[currentTeam].camPosition;
+        mainCamera.transform.position = newCamPos;
+        //mainCamera.transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 0));
+        mainCamera.transform.LookAt(new Vector3(0, 0, 0));
+    }
+
+    public void UpdateHealth() {
+        string txt = "";
+        for (int i = 0; i < numTeams; i++) {
+            txt += "Team " + i + ": " + eggs[i].currentHealth + "/" + eggs[i].maxHealth + "\n";
+        }
+
+        //Debug.Log(txt);
+        canvasScript.ChangeHealthText(txt);
+    }
+
+    public void EggDied(int team) {
+        gameOver = true;
+
+        int winTeam;
+        if (team == 0)
+            winTeam = 1;
+        else
+            winTeam = 0;
+
+        canvasScript.GameOver(winTeam);
     }
 
     private Vector2 GetForceFrom(Vector3 fromPos, Vector3 toPos)
