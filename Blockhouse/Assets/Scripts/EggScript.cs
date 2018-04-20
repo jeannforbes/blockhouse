@@ -10,7 +10,7 @@ public class EggScript : ObjectScript {
     public int currentHealth;
 
     // Force needed to take one damage
-    public int OneDamageForce = 35;
+    private int OneDamageForce = 10;
 
 	// Use this for initialization
 	public override void Start ()
