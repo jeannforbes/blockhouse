@@ -74,7 +74,7 @@ public class BuildGameManagerScript : MonoBehaviour
 
         for (int i = 0; i < cubes.Length; i++)
         {
-            cubes[i].GetComponent<Rigidbody>().isKinematic = true;
+            //cubes[i].GetComponent<Rigidbody>().isKinematic = true;
 
             // set the team colors
             ObjectScript oScript = cubes[i].GetComponent<ObjectScript>();
@@ -159,6 +159,8 @@ public class BuildGameManagerScript : MonoBehaviour
                     displayCube = Instantiate(selectedCube);
                     //displayCube.transform.GetChild(0).gameObject.SetActive(false);
                     displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
+                    
+                    SetAllCubesKinematic(true);
 
                     // turn off isKinematic and freeze rotation and position to allow for collision detection
                     displayCube.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezePositionY;
@@ -179,26 +181,24 @@ public class BuildGameManagerScript : MonoBehaviour
 
             // if in bounds, move the cube
             Renderer rend = boundingFloors[currentTeam].GetComponent<Renderer>();
+            
+            // move cube and check for collisions;
+            displayCube.transform.position = cubePos;
 
-            if (cubePos.x > rend.bounds.min.x &&
-                cubePos.x < rend.bounds.max.x &&
-                cubePos.z > rend.bounds.min.z &&
-                cubePos.z < rend.bounds.max.z &&
-                cubePos.y > 0)
-            {
-                // move cube and check for collisions;
-                displayCube.transform.position = cubePos;
-
-                // check if display cube is colliding with other objects
-                // cannot place the cube if it is colliding
-                if (displayCube.GetComponent<CubeScript>().collidingObjects.Count > 0) {
-                    cannotPlaceCube = true;
-                    displayCube.GetComponent<Renderer>().material.color = new Color(1, 0, 0f, 0.5f);
-                }
-                else {
-                    cannotPlaceCube = false;
-                    displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
-                }
+            // check if display cube is colliding with other objects
+            // cannot place the cube if it is colliding
+            if (displayCube.GetComponent<CubeScript>().collidingObjects.Count > 0 ||    // if not colliding
+                    !(cubePos.x > rend.bounds.min.x &&                                  // or not in bounds
+                    cubePos.x < rend.bounds.max.x &&
+                    cubePos.z > rend.bounds.min.z &&                                    // cannot place
+                    cubePos.z < rend.bounds.max.z)
+                    ) {
+                cannotPlaceCube = true;
+                displayCube.GetComponent<Renderer>().material.color = new Color(1, 0, 0f, 0.5f);
+            }
+            else {
+                cannotPlaceCube = false;
+                displayCube.GetComponent<Renderer>().material.color = new Color(1, 1, .5f, 0.5f);
             }
             
             // Rotate the cube on drag
@@ -267,6 +267,8 @@ public class BuildGameManagerScript : MonoBehaviour
             Destroy(displayCube);
             displayCube = null;
         }
+
+        SetAllCubesKinematic(false);
     }
 
     // All things necessary for switching scene to Destroy mode
@@ -281,16 +283,25 @@ public class BuildGameManagerScript : MonoBehaviour
         }
 
     }
-    /*
-    private void SetSurroundingHitboxActive(bool value)
+
+    public void SetAllCubesKinematic(bool isKin)
     {
+        Debug.Log("KINEMATIC : " + isKin);
         for (int i = 0; i < cubes.Length; i++)
         {
-            if (cubes[i].transform.childCount != 0)
-            {
-                cubes[i].transform.GetChild(0).gameObject.SetActive(value);
-            }
+            cubes[i].GetComponent<Rigidbody>().isKinematic = isKin;
         }
     }
-    */
+        /*
+        private void SetSurroundingHitboxActive(bool value)
+        {
+            for (int i = 0; i < cubes.Length; i++)
+            {
+                if (cubes[i].transform.childCount != 0)
+                {
+                    cubes[i].transform.GetChild(0).gameObject.SetActive(value);
+                }
+            }
+        }
+        */
 }

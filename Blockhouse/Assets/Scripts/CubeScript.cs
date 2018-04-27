@@ -6,9 +6,9 @@ public class CubeScript : ObjectScript
 {
     public bool isSelected = false;
     
-    public float connectAngle = 5.5f;
-    public float jointBreakForce = 50.0f;
-    public float jointBreakTorque = 50.0f;
+    private float connectAngle = 500.5f;
+    private float jointBreakForce = 50.0f;
+    private float jointBreakTorque = 500.0f;
 
     //private float checkRadius = 4.0f;
 

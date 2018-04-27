@@ -29,7 +29,7 @@ public class DestroyGameManagerScript : MonoBehaviour
     public int numTeams;
     public int currentTeam = 0;
 
-    public float shotForce = 100000.0f;
+    private float shotForce = 3000.0f;
     private Vector3 fireDirection;
 
     public bool gameOver = false;
